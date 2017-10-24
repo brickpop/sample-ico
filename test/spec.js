@@ -6,10 +6,10 @@ const ethTx = require("eth-tx");
 
 const { connect, getAccounts, compileTo, wrapContract } = ethTx;
 
-describe('MiniMeToken test', () => {
+describe('Tvrbo Token Test', () => {
   var testrpc;
   var accounts;
-  var tfContract, tContract, sContract;
+  var minimeContracts, tContract, saleContract;
 
   before(async () => {
     testrpc = TestRPC.server({
@@ -33,47 +33,65 @@ describe('MiniMeToken test', () => {
 
   it("should compile the contracts", async () => {
     const tokenFactorySrcFile = path.join(__dirname, "..", "contracts", "util", "MiniMeTokenFactory.sol");
-    const tokenSrcFile = path.join(__dirname, "..", "contracts", "util", "MiniMeToken.sol");
+    // const tokenSrcFile = path.join(__dirname, "..", "contracts", "util", "MiniMeToken.sol");
     const saleSrcFile = path.join(__dirname, "..", "contracts", "TvrboTokenSale.sol");
 
     const tokenFactoryDestination = path.join(__dirname, "..", "build", "token-factory.js");
-    const tokenDestination = path.join(__dirname, "..", "build", "token.js");
-    const saleDestination = path.join(__dirname, "..", "build", "sale.js");
+    // const tokenDestination = path.join(__dirname, "..", "build", "token.js");
+    const saleDestination = path.join(__dirname, "..", "build", "token-sale.js");
 
     if (!fs.existsSync(path.dirname(tokenFactoryDestination)))
       fs.mkdirSync(path.dirname(tokenFactoryDestination));
 
     await compileTo(tokenFactorySrcFile, tokenFactoryDestination, {});
-    await compileTo(tokenSrcFile, tokenDestination, {});
+    // await compileTo(tokenSrcFile, tokenDestination, {});
     await compileTo(saleSrcFile, saleDestination, {});
-  }).timeout(30000);
+  }).timeout(60000);
 
   it("should import the contract's data", () => {
-    tfContract = require(path.join(__dirname, "..", "build", "token-factory.js"));
-    tContract = require(path.join(__dirname, "..", "build", "token.js"));
-    sContract = require(path.join(__dirname, "..", "build", "sale.js"));
+    minimeContracts = require(path.join(__dirname, "..", "build", "token-factory.js"));
+    saleContract = require(path.join(__dirname, "..", "build", "token-sale.js"));
 
-    assert(!!tfContract.MiniMeTokenFactory);
-    assert(!!tContract.MiniMeToken);
-    assert(!!sContract.TvrboTokenSale);
+    assert(!!minimeContracts.MiniMeTokenFactory);
+    assert(!!minimeContracts.MiniMeToken);
+    assert(!!saleContract.TvrboTokenSale);
   });
 
-  // it('should deploy all the contracts', async () => {
-  //   const factory = wrapContract();
+  it('should deploy all the contracts', async () => {
+    const MiniMeTokenFactory = wrapContract(minimeContracts.MiniMeTokenFactory.abi, minimeContracts.MiniMeTokenFactory.byteCode);
+    const MiniMeToken = wrapContract(minimeContracts.MiniMeToken.abi, minimeContracts.MiniMeToken.byteCode);
+    const TvrboTokenSale = wrapContract(saleContract.TvrboTokenSale.abi, saleContract.TvrboTokenSale.byteCode);
 
-  //   const tokenFactory = await MiniMeTokenFactory.new(web3);
+    // TOKEN FACTORY
+    const tokenFactory = await MiniMeTokenFactory.new();
+    assert.ok(tokenFactory.$address);
 
-  //   miniMeToken = await MiniMeToken.new(web3,
-  //     tokenFactory.$address,
-  //     0,
-  //     0,
-  //     'MiniMe Test Token',
-  //     18,
-  //     'MMT',
-  //     true);
-  //   assert.ok(miniMeToken.$address);
-  //   miniMeTokenState = new MiniMeTokenState(miniMeToken);
-  // }).timeout(20000);
+    // TOKEN ITSELF
+    const miniMeToken = await MiniMeToken.new(tokenFactory.$address,
+      0,
+      0,
+      'MiniMe Test Token',
+      18,
+      'MMT',
+      true);
+
+    assert.ok(miniMeToken.$address);
+
+    // TOKEN SALE CAMPAIGN
+    const _startFundingTime = 0;
+    const _endFundingTime = Date.now() + 1000 * 60 * 60 * 60 * 60;
+    const _maximumFunding = 10000000000000000000; // 10 ether
+    const _vaultAddress = accounts[0];
+    const _tokenAddress = miniMeToken.$address;
+
+    const tokenSale = await TvrboTokenSale.new(_startFundingTime,
+      _endFundingTime,
+      _maximumFunding,
+      _vaultAddress,
+      _tokenAddress);
+
+      assert(tokenSale.$address);
+  }).timeout(20000);
 
 
 });
