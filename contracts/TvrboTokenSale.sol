@@ -5,7 +5,6 @@ import "./util/Owned.sol";
 import "./util/SafeMath.sol";
 
 contract TvrboTokenSale is TokenController, Owned {
-
     uint public startFundingTime;       // In UNIX Time Format
     uint public endFundingTime;         // In UNIX Time Format
     uint public maximumFunding;         // In wei
@@ -31,7 +30,7 @@ contract TvrboTokenSale is TokenController, Owned {
         uint _maximumFunding,
         address _vaultAddress,
         address _tokenAddress
-    ) {
+    ) public {
         require(_endFundingTime >= now);
         require(_endFundingTime > _startFundingTime);
         require(_maximumFunding <= 10000 ether);
@@ -49,7 +48,7 @@ contract TvrboTokenSale is TokenController, Owned {
     /// `_owner`. Payable is a required solidity modifier for functions to receive
     /// ether, without this modifier functions will throw if ether is sent to them
 
-    function () payable {
+    function () public payable {
         processPayment(msg.sender);
     }
 
@@ -61,7 +60,7 @@ contract TvrboTokenSale is TokenController, Owned {
     /// have the tokens created in an address of their choosing
     /// @param _owner The address that will hold the newly created tokens
 
-    function proxyPayment(address _owner) payable returns(bool) {
+    function proxyPayment(address _owner) public payable returns(bool) {
         processPayment(_owner);
         return true;
     }
@@ -73,7 +72,7 @@ contract TvrboTokenSale is TokenController, Owned {
     /// @param _amount The amount of the transfer
     /// @return False if the controller does not authorize the transfer
 
-    function onTransfer(address _from, address _to, uint _amount) returns(bool) {
+    function onTransfer(address _from, address _to, uint _amount) public returns(bool) {
         return true;
     }
 
@@ -85,7 +84,7 @@ contract TvrboTokenSale is TokenController, Owned {
     /// @return False if the controller does not authorize the approval
 
     function onApprove(address _owner, address _spender, uint _amount)
-        returns(bool)
+        public returns(bool)
     {
         return true;
     }
@@ -121,7 +120,7 @@ contract TvrboTokenSale is TokenController, Owned {
     ///  TvrboTokenSale from receiving more ether
     /// @dev `endFunding()` can only be called after the end of the funding period.
 
-    function endFunding() {
+    function endFunding() public {
         require(now >= endFundingTime);
         tokenContract.changeController(0);
     }
@@ -129,7 +128,7 @@ contract TvrboTokenSale is TokenController, Owned {
     /// @notice `onlyOwner` changes the location that ether is sent
     /// @param _newVaultAddress The address that will receive the ether sent to this
     ///  TvrboTokenSale
-    function setDestinationVault(address _newVaultAddress) onlyOwner {
+    function setDestinationVault(address _newVaultAddress) public onlyOwner {
         vaultAddress = _newVaultAddress;
     }
 }
