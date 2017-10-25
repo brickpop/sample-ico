@@ -9,7 +9,7 @@ const { connect, getAccounts, compileTo, wrapContract } = ethTx;
 describe('Tvrbo Token Test', () => {
   var testrpc;
   var accounts;
-  var minimeContracts, tContract, saleContract;
+  var minimeContracts, saleContract;
 
   before(async () => {
     testrpc = TestRPC.server({
@@ -46,15 +46,18 @@ describe('Tvrbo Token Test', () => {
     await compileTo(tokenFactorySrcFile, tokenFactoryDestination, {});
     // await compileTo(tokenSrcFile, tokenDestination, {});
     await compileTo(saleSrcFile, saleDestination, {});
+
+    assert(fs.existsSync(tokenFactoryDestination));
+    assert(fs.existsSync(saleDestination));
   }).timeout(60000);
 
   it("should import the contract's data", () => {
     minimeContracts = require(path.join(__dirname, "..", "build", "token-factory.js"));
     saleContract = require(path.join(__dirname, "..", "build", "token-sale.js"));
 
-    assert(!!minimeContracts.MiniMeTokenFactory);
-    assert(!!minimeContracts.MiniMeToken);
-    assert(!!saleContract.TvrboTokenSale);
+    assert.ok(minimeContracts.MiniMeTokenFactory);
+    assert.ok(minimeContracts.MiniMeToken);
+    assert.ok(saleContract.TvrboTokenSale);
   });
 
   it('should deploy all the contracts', async () => {
@@ -67,22 +70,22 @@ describe('Tvrbo Token Test', () => {
     assert.ok(tokenFactory.$address);
 
     // TOKEN ITSELF
-    const miniMeToken = await MiniMeToken.new(tokenFactory.$address,
+    const tvrboToken = await MiniMeToken.new(tokenFactory.$address,
       0,
       0,
-      'MiniMe Test Token',
+      'Tvrbo Token',
       18,
-      'MMT',
+      'XTK',
       true);
 
-    assert.ok(miniMeToken.$address);
+    assert.ok(tvrboToken.$address);
 
     // TOKEN SALE CAMPAIGN
-    const _startFundingTime = 0;
+    const _startFundingTime = Date.now() - 1000 * 60;
     const _endFundingTime = Date.now() + 1000 * 60 * 60 * 60 * 60;
-    const _maximumFunding = 10000000000000000000; // 10 ether
+    const _maximumFunding = ethTx.getCurrentWeb3().utils.toWei("10", "ether");
     const _vaultAddress = accounts[0];
-    const _tokenAddress = miniMeToken.$address;
+    const _tokenAddress = tvrboToken.$address;
 
     const tokenSale = await TvrboTokenSale.new(_startFundingTime,
       _endFundingTime,
@@ -92,8 +95,4 @@ describe('Tvrbo Token Test', () => {
 
       assert(tokenSale.$address);
   }).timeout(20000);
-
-
 });
-
-

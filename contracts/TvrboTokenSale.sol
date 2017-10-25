@@ -31,9 +31,9 @@ contract TvrboTokenSale is TokenController, Owned {
         address _vaultAddress,
         address _tokenAddress
     ) public {
-        require(_endFundingTime >= now);
+        // require(_endFundingTime >= now);
         require(_endFundingTime > _startFundingTime);
-        require(_maximumFunding <= 10000 ether);
+        // require(_maximumFunding <= 10000 ether);
         // require(_vaultAddress != 0);
 
         startFundingTime = _startFundingTime;
