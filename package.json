@@ -26,6 +26,6 @@
     "mocha": "^4.0.1"
   },
   "dependencies": {
-    "eth-tx": "^0.8.0"
+    "eth-tx": "^0.8.1"
   }
 }

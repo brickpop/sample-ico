@@ -67,7 +67,7 @@ describe('Tvrbo Token Test', () => {
 
     // TOKEN FACTORY
     const tokenFactory = await MiniMeTokenFactory.new();
-    assert.ok(tokenFactory.$address);
+    assert.ok(tokenFactory.$address, "tokenFactory should have an address");
 
     // TOKEN ITSELF
     const tvrboToken = await MiniMeToken.new(tokenFactory.$address,
@@ -78,7 +78,7 @@ describe('Tvrbo Token Test', () => {
       'XTK',
       true);
 
-    assert.ok(tvrboToken.$address);
+    assert.ok(tvrboToken.$address, "tvrboToken should have an address");
 
     // TOKEN SALE CAMPAIGN
     const _startFundingTime = Date.now() - 1000 * 60;
@@ -93,6 +93,6 @@ describe('Tvrbo Token Test', () => {
       _vaultAddress,
       _tokenAddress);
 
-      assert(tokenSale.$address);
+      assert(tokenSale.$address, "tokenSale should have an address");
   }).timeout(20000);
 });
