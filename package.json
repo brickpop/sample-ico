@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "deploy": "node scripts/deploy",
-    "test": "mocha"
+    "test": "mocha",
+    "check": "solium -d contracts/",
+    "dev": "solium --watch -d contracts/",
+    "fix": "solium -d contracts/ --fix"
   },
   "repository": {
     "type": "git",
@@ -26,6 +29,7 @@
     "mocha": "^4.0.1"
   },
   "dependencies": {
-    "eth-tx": "^0.8.1"
+    "eth-tx": "^0.8.1",
+    "solium": "^1.0.3"
   }
 }
