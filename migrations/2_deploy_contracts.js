@@ -38,8 +38,8 @@ module.exports = function(deployer, network, accounts) {
   .then(instance => {
     campaign = instance;
 
-    // minimeToken.changeController(campaign.address);
-    minimeToken.changeController(accounts[0]);
+    minimeToken.changeController(campaign.address);
+    // minimeToken.changeController(accounts[0]);
   })
   .catch(console.log);
 

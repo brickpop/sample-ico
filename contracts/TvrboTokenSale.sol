@@ -9,7 +9,7 @@ contract TvrboTokenSale is TokenController, Owned {
     uint public endFundingTime;         // In UNIX Time Format
     uint public maximumFunding;         // In wei
     uint public totalCollected;         // In wei
-    MiniMeToken public tokenContract;   // The new token for this TvrboTokenSale
+    MiniMeToken public tokenContract;   // The token for this Token Sale
     address public vaultAddress;        // The address to hold the funds donated
 
     /// @notice 'TvrboTokenSale()' initiates the TvrboTokenSale by setting its funding
